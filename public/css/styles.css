@@ -23,6 +23,10 @@
     margin-bottom: 1%;
 }
 
+.inline {
+    display: inline;
+}
+
 .footer-padding {
     padding-bottom: 60px;
 }
