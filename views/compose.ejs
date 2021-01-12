@@ -1,0 +1,36 @@
+<%- include("partials/header") -%>
+<div class="container">
+    <h1>Compose</h1>
+    <!-- <form>
+        <input name="" placeholder="Enter Your Content" />
+        <button>Publish</button>
+    </form> -->
+
+    <div class="input-group mb-3">
+        <form action="/compose" method="POST">
+            <label for="title">Title</label>
+            <input
+                name="newTitle"
+                type="text"
+                id="title"
+                class="form-control"
+                placeholder=""
+            />
+            <div class="form-group">
+                <label for="text-area">Post</label>
+                <textarea
+                    class="form-control"
+                    id="text-area"
+                    rows="6"
+                    name="newContent"
+                ></textarea>
+            </div>
+
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">Publish</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include("partials/footer") -%>
