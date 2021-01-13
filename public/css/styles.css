@@ -8,11 +8,16 @@
     border: 0;
     border-radius: 0;
     margin-bottom: 0;
-    font-size: 12px;
+    font-size: 1.3rem;
     letter-spacing: 5px;
 }
 .navbar-nav li a:hover {
     color: #30475e !important;
+}
+
+.dog {
+    color: #999b84;
+    font-size: 5rem;
 }
 
 .input-group {
