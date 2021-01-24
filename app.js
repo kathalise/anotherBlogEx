@@ -6,8 +6,6 @@ const ejs = require("ejs");
 var _ = require("lodash");
 const mongoose = require("mongoose");
 
-const posts = [];
-
 const homeStartingContent =
     "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
 const aboutContent =
@@ -68,25 +66,21 @@ app.get("/compose", function (req, res) {
     res.render("compose");
 });
 
-app.get("/posts/:title", function (req, res) {
-    const requestedTitle = _.lowerCase(req.params.title);
-    console.log(requestedTitle);
+app.get("/posts/:postId", function (req, res) {
+    // const requestedTitle = _.lowerCase(req.params.title);
+    console.log(req.params.postId);
+    const postId = req.params.postId;
 
-    Blogpost.find({ title: requestedTitle }, function (err, foundBlogpost) {
-        // const foundTitle = _.lowerCase(foundBlogpost.title);
-        // if (!err) {
-        //     if (foundTitle === requestedTitle) {
-        //         res.render("post", {
-        //             requestedTitle: foundBlogpost.title,
-        //             requestedContent: foundBlogpost.body,
-        //         });
-        //     } else {
-        //         console.log("No such Post");
-        //     }
-        // } else {
-        //     console.log(err);
-        // }
-        console.log("foundBlogpost:", foundBlogpost);
+    Blogpost.findOne({ _id: postId }, function (err, foundBlogpost) {
+        if (!err) {
+            res.render("post", {
+                requestedTitle: foundBlogpost.title,
+                requestedContent: foundBlogpost.body,
+            });
+            // console.log(foundBlogpost);
+        } else {
+            console.log(err);
+        }
     });
 });
 
@@ -101,10 +95,13 @@ app.post("/compose", function (req, res) {
         body: post.body,
     });
 
-    blogpost.save();
-    console.log("The blogpost was saved to the DB.");
-    // posts.push(blogpost);
-    res.redirect("/");
+    blogpost.save(function (err) {
+        if (!err) {
+            res.redirect("/");
+        } else {
+            console.log(err);
+        }
+    });
 });
 
 app.listen(3000, function () {
