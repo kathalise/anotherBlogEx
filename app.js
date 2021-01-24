@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 var _ = require("lodash");
+const mongoose = require("mongoose");
 
 const posts = [];
 
@@ -21,10 +22,37 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+////// connecting to mongoDB & creating a new DB "todolistDB"
+mongoose.connect("mongodb://localhost:27017/myblogDB", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
+
+///// Schema
+const blogpostsSchema = {
+    title: {
+        type: String,
+        required: true,
+    },
+
+    body: {
+        type: String,
+        required: true,
+    },
+};
+
+///// Model based on Schema
+const Blogpost = mongoose.model("Blogpost", blogpostsSchema);
+
 app.get("/", function (req, res) {
-    res.render("home", {
-        startingContent: homeStartingContent,
-        posts: posts,
+    Blogpost.find({}, function (err, blogposts) {
+        if (!err) {
+            res.render("home", {
+                startingContent: homeStartingContent,
+                posts: blogposts,
+            });
+            // console.log(blogposts);
+        }
     });
 });
 
@@ -42,27 +70,40 @@ app.get("/compose", function (req, res) {
 
 app.get("/posts/:title", function (req, res) {
     const requestedTitle = _.lowerCase(req.params.title);
+    console.log(requestedTitle);
 
-    posts.forEach(function (post) {
-        const storedTitle = _.lowerCase(post.title);
-        if (storedTitle === requestedTitle) {
-            res.render("post", {
-                requestedTitle: post.title,
-                requestedContent: post.content,
-            });
-        } else {
-            console.log("No such Post");
-        }
+    Blogpost.find({ title: requestedTitle }, function (err, foundBlogpost) {
+        // const foundTitle = _.lowerCase(foundBlogpost.title);
+        // if (!err) {
+        //     if (foundTitle === requestedTitle) {
+        //         res.render("post", {
+        //             requestedTitle: foundBlogpost.title,
+        //             requestedContent: foundBlogpost.body,
+        //         });
+        //     } else {
+        //         console.log("No such Post");
+        //     }
+        // } else {
+        //     console.log(err);
+        // }
+        console.log("foundBlogpost:", foundBlogpost);
     });
 });
 
 app.post("/compose", function (req, res) {
     const post = {
         title: req.body.newTitle,
-        content: req.body.newContent,
+        body: req.body.newContent,
     };
 
-    posts.push(post);
+    const blogpost = new Blogpost({
+        title: post.title,
+        body: post.body,
+    });
+
+    blogpost.save();
+    console.log("The blogpost was saved to the DB.");
+    // posts.push(blogpost);
     res.redirect("/");
 });
 
